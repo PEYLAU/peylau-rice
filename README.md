@@ -31,7 +31,7 @@ La configuración de mi escritorio, versionada. Dos cosas la separan de un volca
 
 Cristal esmerilado al estilo de iOS y visionOS. Los cuatro detalles que lo sostienen:
 
-| | |
+| Detalle | Por qué importa |
 |---|---|
 | **Saturación bajo el cristal** | El `vibrancy` del desenfoque de Hyprland satura lo que queda detrás del panel. Es lo que distingue el cristal de visionOS de un desenfoque a secas: el color del fondo *sangra* a través. |
 | **Esquinas squircle** | `rounding_power = 4`. Con el 2 de serie la esquina es un arco de circunferencia y se aprecia el corte al llegar al lado recto. Al subirlo la curvatura se vuelve continua, que es la mitad de por qué un icono de iOS se ve suave. |
