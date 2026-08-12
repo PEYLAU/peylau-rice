@@ -27,6 +27,14 @@
 !/ghostty/
 !/xdg-terminals.list
 
+# --- Shell ---
+# Solo config.fish. fish_variables son variables universales que fish reescribe
+# solo (rutas absolutas, estado de plugins): versionarlo genera conflictos en
+# cada maquina y no aporta nada.
+!/fish/
+/fish/*
+!/fish/config.fish
+
 # --- Utilidades ---
 !/btop/
 !/cava/
