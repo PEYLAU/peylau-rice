@@ -1,0 +1,75 @@
+#!/bin/bash
+# Sync the Zen browser userChrome.css with the current Omarchy theme.
+
+COLORS_FILE="$HOME/.config/omarchy/current/theme/colors.toml"
+[[ -f $COLORS_FILE ]] || exit 0
+
+get_color() {
+  sed -n "s/^$1 = //p" "$COLORS_FILE" | tr -d '"'
+}
+
+BACKGROUND=$(get_color background)
+FOREGROUND=$(get_color foreground)
+ACCENT=$(get_color accent)
+COLOR0=$(get_color color0)
+COLOR8=$(get_color color8)
+
+BACKGROUND=${BACKGROUND:-#1a1b26}
+FOREGROUND=${FOREGROUND:-#a9b1d6}
+ACCENT=${ACCENT:-#7aa2f7}
+COLOR0=${COLOR0:-#32344a}
+COLOR8=${COLOR8:-#444b6a}
+
+ZEN_DIR="$HOME/.config/zen"
+[[ -d $ZEN_DIR ]] || exit 0
+
+ZEN_PROFILE=""
+if [[ -f $ZEN_DIR/profiles.ini ]]; then
+  ZEN_PROFILE=$(awk -F= '/^\[Install/ {install=1} install && /^Default=/ {print $2; exit}' "$ZEN_DIR/profiles.ini")
+  ZEN_PROFILE="$ZEN_DIR/$ZEN_PROFILE"
+fi
+[[ -n $ZEN_PROFILE && -f $ZEN_PROFILE/prefs.js ]] || exit 0
+
+mkdir -p "$ZEN_PROFILE/chrome"
+
+cat > "$ZEN_PROFILE/chrome/userChrome.css" <<EOF
+/* Generated from Omarchy theme: $(cat "$HOME/.config/omarchy/current/theme.name" 2>/dev/null || echo "custom") */
+:root {
+  --zen-main-browser-background: $BACKGROUND !important;
+  --zen-main-browser-background-toolbar: $BACKGROUND !important;
+  --zen-colors-tertiary: $BACKGROUND !important;
+  --zen-colors-secondary: $COLOR0 !important;
+  --zen-colors-border: $COLOR8 !important;
+  --zen-colors-border-contrast: $COLOR8 !important;
+  --zen-colors-primary: $FOREGROUND !important;
+  --zen-colors-primary-foreground: $BACKGROUND !important;
+  --zen-colors-hover-bg: $COLOR8 !important;
+  --zen-colors-input-bg: $COLOR0 !important;
+  --zen-primary-color: $ACCENT !important;
+  --zen-toolbar-element-bg: $COLOR0 !important;
+  --zen-toolbar-element-bg-hover: $COLOR8 !important;
+  --zen-urlbar-background: $COLOR0 !important;
+  --zen-in-content-dialog-background: $BACKGROUND !important;
+  --zen-dialog-background: $BACKGROUND !important;
+  --toolbar-bgcolor: $BACKGROUND !important;
+  --toolbar-color: $FOREGROUND !important;
+  --toolbar-field-background-color: $COLOR0 !important;
+  --toolbar-field-color: $FOREGROUND !important;
+  --toolbar-field-border-color: transparent !important;
+  --tabs-background: $BACKGROUND !important;
+  --lwt-text-color: $FOREGROUND !important;
+  --lwt-accent-color: $BACKGROUND !important;
+  --toolbarbutton-icon-fill: $FOREGROUND !important;
+}
+EOF
+
+# Make sure Zen always loads userChrome.css
+if [[ ! -f $ZEN_PROFILE/user.js ]] || ! grep -q legacyUserProfileCustomizations "$ZEN_PROFILE/user.js" 2>/dev/null; then
+  echo 'user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);' >> "$ZEN_PROFILE/user.js"
+fi
+
+echo "Zen userChrome.css updated"
+
+if pgrep -f zen-bin >/dev/null; then
+  notify-send -u low "Zen browser" "Theme updated. Restart Zen to apply the new colors." 2>/dev/null
+fi

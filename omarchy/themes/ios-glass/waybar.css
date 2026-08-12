@@ -1,0 +1,41 @@
+/* iOS Glass — waybar
+ *
+ * Este fichero lo importa ~/.config/waybar/style.css en su PRIMERA linea, asi
+ * que todo lo de aqui se lee ANTES que las reglas del usuario. En CSS el orden
+ * solo desempata entre selectores de la MISMA especificidad, de modo que para
+ * imponerse a una regla del usuario hay que subir la especificidad, no confiar
+ * en el orden. Abajo se hace justo eso en el tooltip.
+ *
+ * El cristal en si no se pinta aqui: aqui solo se declara un fondo translucido.
+ * El desenfoque de lo que hay DETRAS lo aplica hyprland con
+ * `layerrule = blur on, match:namespace waybar` (ver hyprland.conf del tema).
+ * Sin esa layerrule esto se ve simplemente transparente, no esmerilado.
+ */
+
+@define-color foreground #EDEDF0;
+
+/* El alpha va aqui dentro a proposito. style.css pinta la barra con
+ * `alpha(@background, 0.99)`, y alpha() en GTK MULTIPLICA, no fija: el 0.99
+ * es un truco anti-bug (evita que GTK declare la superficie como opaca y
+ * hyprland se salte el blending tapando las esquinas redondeadas), y sobre
+ * este 0.42 se queda en ~0.416. Es decir, los dos valores se combinan bien. */
+@define-color background rgba(30, 30, 38, 0.42);
+
+/* La linea fina clara del borde es LA firma del cristal de iOS: simula el
+ * canto biselado por donde entra la luz. Sin ella el panel flota sin apoyo.
+ * Gana al `* { border: none }` del usuario por especificidad (id + elemento
+ * frente al universal), aunque aquella regla se lea despues. */
+window#waybar {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+/* Los tooltips son superficies GTK aparte y NO los alcanza la layerrule del
+ * namespace waybar: no llevan blur. Con el 0.42 de la barra se leerian sobre
+ * el escritorio pelado, asi que se les pone un fondo casi solido propio.
+ *
+ * `tooltip.background` (elemento + clase) gana a `tooltip` (solo elemento) de
+ * style.css. La clase .background la pone GTK en la ventana del tooltip. */
+tooltip.background {
+  background-color: rgba(24, 24, 30, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}

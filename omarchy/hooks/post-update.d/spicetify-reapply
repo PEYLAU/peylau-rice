@@ -1,0 +1,22 @@
+#!/bin/bash
+# Spotify updates overwrite spicetify's patch, so re-apply it after every
+# `omarchy update` (which runs the full system upgrade).
+
+set -e
+
+command -v spicetify >/dev/null || exit 0
+[[ -d /opt/spotify ]] || exit 0
+
+# Igual que en theme-set.d/spotify-spicetify-theme: sin -n, `apply` ABRE Spotify
+# aunque estuviera cerrado. Solo dejamos que lo reinicie si ya estaba en marcha.
+SPICE_ARGS=()
+pgrep -x spotify >/dev/null || SPICE_ARGS=(-n)
+
+if ! spicetify "${SPICE_ARGS[@]}" apply >/dev/null 2>&1; then
+  spicetify "${SPICE_ARGS[@]}" backup apply >/dev/null 2>&1 || {
+    notify-send -u low "Spicetify" "No se pudo re-aplicar el tema de Spotify. Ejecuta: spicetify backup apply" 2>/dev/null
+    exit 0
+  }
+fi
+
+echo "Spotify (spicetify) patch re-applied"

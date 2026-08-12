@@ -1,0 +1,193 @@
+@import "../omarchy/current/theme/waybar.css";
+
+* {
+  /* Transparente para que las esquinas redondeadas de la barra no queden
+     tapadas por el fondo cuadrado de cada modulo */
+  background-color: transparent;
+  color: @foreground;
+
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  font-family: 'JetBrainsMono Nerd Font';
+  font-size: 12px;
+}
+
+/* Barra flotante: el fondo lo pinta solo la ventana.
+   El alpha() NO es decorativo, arregla un bug: con un fondo 100% opaco GTK
+   marca toda la superficie wayland como opaca (wl_surface.set_opaque_region).
+   Hyprland entonces se salta el blending y pinta el rectangulo entero, con lo
+   que las esquinas cuadradas asoman por detras del redondeo. Es intermitente
+   porque depende de que haya debajo de la barra. Con alpha < 1 GTK ya no
+   declara la region opaca y el redondeo se respeta siempre.
+   Ver https://github.com/Alexays/Waybar/issues/3850 */
+window#waybar {
+  background-color: alpha(@background, 0.99);
+  border-radius: 8px;
+}
+
+.modules-left {
+  margin-left: 8px;
+}
+
+.modules-right {
+  margin-right: 8px;
+}
+
+#workspaces button {
+  all: initial;
+  padding: 0 6px;
+  margin: 0 1.5px;
+  min-width: 9px;
+}
+
+#workspaces button.empty {
+  opacity: 0.5;
+}
+
+/* El titulo existe por duplicado (-ext / -int), uno por barra. Solo uno de los
+   dos se dibuja: el del monitor principal. Ver scripts/media-rol.sh. */
+#custom-media-title-ext,
+#custom-media-title-int {
+  margin-left: 14px;
+  padding: 0 2px;
+}
+
+#custom-media-title-ext.paused,
+#custom-media-title-int.paused {
+  opacity: 0.55;
+}
+
+/* --- Reproductor -------------------------------------------------------- */
+
+/* Los tres botones de control.
+   Van por ID y no por la clase .media-control: esa clase solo la asigna waybar
+   cuando el modulo esta dentro de un drawer, y ademas pierde contra la regla
+   `*` de arriba, que fija font-size a TODOS los widgets. Los IDs los pone
+   waybar siempre y ganan por especificidad.
+
+   OJO con el atajo `margin`: con UN valor son los cuatro lados, y como la
+   barra solo mide 26px de alto eso recorta los iconos. Con DOS valores el 1o
+   es vertical (tiene que ser 0) y el 2o horizontal. Para separarlos mas,
+   sube solo el segundo. */
+#custom-media-prev,
+#custom-media-playpause,
+#custom-media-next {
+  font-size: 18px;
+  padding: 0 4px;   /* zona pulsable alrededor del icono */
+  margin: 0 9px;    /* ← SEPARACION entre botones */
+  opacity: 0.75;
+}
+
+#custom-media-prev:hover,
+#custom-media-playpause:hover,
+#custom-media-next:hover {
+  opacity: 1;
+}
+
+/* Aire extra a los lados del bloque, para que no toque ni el titulo ni la
+   barra de progreso. Va despues para que gane a la regla de arriba. */
+#custom-media-prev {
+  margin-left: 16px;
+}
+
+#custom-media-next {
+  margin-right: 10px;
+}
+
+/* Progreso y visualizador: secundarios, no deben competir con el titulo. */
+#custom-mediaprogress-ext,
+#custom-mediaprogress-int {
+  margin-left: 12px;
+  opacity: 0.6;
+  font-size: 11px;
+}
+
+#custom-cava-ext,
+#custom-cava-int {
+  margin-left: 12px;
+  opacity: 0.8;
+  font-size: 11px;
+}
+
+#cpu,
+#battery,
+#pulseaudio,
+#custom-omarchy,
+#custom-update {
+  min-width: 12px;
+  margin: 0 7.5px;
+}
+
+#tray {
+  margin-right: 16px;
+}
+
+#bluetooth {
+  margin-right: 17px;
+}
+
+#network {
+  margin-right: 13px;
+}
+
+#custom-expand-icon {
+  margin-right: 18px;
+}
+
+tooltip {
+  background-color: @background;
+  padding: 2px;
+  border-radius: 8px;
+}
+
+#custom-update {
+  font-size: 10px;
+}
+
+#clock {
+  margin-left: 8.75px;
+}
+
+#custom-weather {
+  margin-left: 7.5px;
+  margin-right: 7.5px;
+}
+
+#custom-weather.unavailable {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.hidden {
+  opacity: 0;
+}
+
+#custom-screenrecording-indicator,
+#custom-idle-indicator,
+#custom-notification-silencing-indicator {
+  min-width: 12px;
+  margin-left: 5px;
+  margin-right: 0;
+  font-size: 10px;
+  padding-bottom: 1px;
+}
+
+#custom-screenrecording-indicator.active {
+  color: #a55555;
+}
+
+#custom-idle-indicator.active,
+#custom-notification-silencing-indicator.active {
+  color: #a55555;
+}
+
+#custom-voxtype {
+  min-width: 12px;
+  margin: 0 0 0 7.5px;
+}
+
+#custom-voxtype.recording {
+  color: #a55555;
+}

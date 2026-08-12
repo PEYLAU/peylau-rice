@@ -1,0 +1,40 @@
+// Dos barras identicas salvo por una cosa: que juego de modulos de reproductor
+// cargan.
+//
+// Waybar no permite limitar un MODULO a un monitor -- el "output" solo existe
+// a nivel de barra. Asi que definimos dos barras: una para pantallas externas
+// y otra para la del portatil. Todo lo demas (modulos, posicion, altura) sale
+// de common.jsonc, que las dos incluyen, para no duplicar nada.
+//
+// El "!" excluye un monitor: la barra "externa" existe solo cuando hay algo
+// conectado que no sea la pantalla interna. Si la desconectas, waybar destruye
+// esa barra sola y queda unicamente la del portatil.
+//
+// Cual de las dos MUESTRA el reproductor no se decide aqui: cada juego de
+// modulos le pasa su papel ("externo" / "interno") a los scripts, y estos se
+// ocultan si su monitor no es el principal en ese momento. Por eso el salto de
+// una barra a otra es automatico al conectar o desconectar, sin reiniciar.
+[
+  {
+    "output": "!eDP-1",
+    "modules-left": [
+      "custom/omarchy",
+      "hyprland/workspaces",
+      "group/media-ext",
+      "custom/mediaprogress-ext",
+      "custom/cava-ext"
+    ],
+    "include": ["~/.config/waybar/common.jsonc"]
+  },
+  {
+    "output": "eDP-1",
+    "modules-left": [
+      "custom/omarchy",
+      "hyprland/workspaces",
+      "group/media-int",
+      "custom/mediaprogress-int",
+      "custom/cava-int"
+    ],
+    "include": ["~/.config/waybar/common.jsonc"]
+  }
+]

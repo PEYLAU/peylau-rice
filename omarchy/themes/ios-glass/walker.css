@@ -1,0 +1,23 @@
+/* iOS Glass — walker (lanzador)
+ *
+ * Solo define colores: la estructura del lanzador vive en
+ * ~/.config/walker/themes/omarchy-rounded/style.css, que consume estas
+ * variables. Ojo, alli el panel se pinta con `alpha(@base, 0.95)`, y alpha()
+ * multiplica: el 0.62 de abajo acaba siendo ~0.59 en pantalla.
+ *
+ * Igual que en waybar, el esmerilado real lo pone hyprland con
+ * `layerrule = blur on, match:namespace walker`. Aqui solo se abre el alpha.
+ */
+
+@define-color selected-text #0A84FF;
+@define-color text #EDEDF0;
+
+/* Mas opaco que la barra (0.62 frente a 0.42): el lanzador es una superficie
+ * de lectura, con listas y texto pequeño, y ahi el contraste manda sobre el
+ * efecto. iOS hace lo mismo: los paneles con contenido denso son mas solidos
+ * que los adornos. */
+@define-color base rgba(24, 24, 30, 0.62);
+@define-color background rgba(24, 24, 30, 0.62);
+
+@define-color border rgba(255, 255, 255, 0.16);
+@define-color foreground #EDEDF0;

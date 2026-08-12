@@ -1,0 +1,58 @@
+# Lista BLANCA, no negra.
+#
+# ~/.config tiene dentro sesiones de navegador, cookies y tokens (chromium,
+# zen, mozilla, vesktop, opencode...). Con una lista negra basta olvidar una
+# entrada para publicar credenciales, y en git eso ya no se borra del historial
+# aunque quites el fichero despues. Asi que se ignora TODO y se readmite a mano
+# solo lo que es configuracion de escritorio.
+#
+# Al añadir algo nuevo: primero `!/loquesea/`, luego `git status` y comprobar
+# que no arrastra nada que no toque.
+
+/*
+!.gitignore
+!README.md
+
+# --- Escritorio ---
+!/hypr/
+!/waybar/
+!/walker/
+!/mako/
+!/swayosd/
+
+# --- Terminales ---
+!/alacritty/
+!/foot/
+!/kitty/
+!/ghostty/
+!/xdg-terminals.list
+
+# --- Utilidades ---
+!/btop/
+!/cava/
+!/fastfetch/
+!/uwsm/
+!/starship.toml
+
+# --- Omarchy ---
+# Se readmite el directorio pero no todo su contenido: 'current' son ficheros
+# GENERADOS por `omarchy theme set` a partir de themes/ + plantillas, pesa 7 MB
+# y cambia en cada cambio de tema. Versionarlo seria ruido puro.
+!/omarchy/
+/omarchy/*
+!/omarchy/themes/
+!/omarchy/hooks/
+!/omarchy/themed/
+!/omarchy/branding/
+
+# --- Basura que no se versiona ---
+# omarchy-refresh-config deja copias con timestamp al reemplazar un config
+# (style.css.bak.1786384053). Son utiles en local, no en el repo.
+*.bak
+*.bak.*
+
+# Caches y estado que algunas apps escriben dentro de su carpeta de config.
+*.log
+*.tmp
+/btop/btop.log
+/nvim/lazy-lock.json.bak

@@ -1,0 +1,63 @@
+# iOS Glass — alacritty
+#
+# ~/.config/alacritty/alacritty.toml importa este fichero. Alacritty fusiona
+# tablas: lo que define el fichero que importa gana, y lo que solo esta aqui
+# se conserva. Tu config define [window] padding y decorations pero NO opacity,
+# asi que el opacity de abajo se aplica sin pisar nada tuyo.
+
+[window]
+# La transparencia se pone AQUI, no con `active_opacity` de hyprland. La
+# diferencia importa: hyprland atenuaria la ventana entera, texto incluido, y
+# quedaria un terminal ilegible y lavado. Con opacity de alacritty solo se
+# vuelve translucido el FONDO, y las letras siguen a full opacidad.
+# Encima de esto, hyprland desenfoca lo que se ve a traves (decoration:blur),
+# que es lo que lo convierte en cristal y no en un cristal sucio.
+opacity = 0.85
+
+[colors.primary]
+background = "#0E0E12"
+foreground = "#EDEDF0"
+
+[colors.cursor]
+text = "#0E0E12"
+cursor = "#F5F5F7"
+
+[colors.vi_mode_cursor]
+text = "#0E0E12"
+cursor = "#F5F5F7"
+
+[colors.search.matches]
+foreground = "#0E0E12"
+background = "#FFD60A"
+
+[colors.search.focused_match]
+foreground = "#0E0E12"
+background = "#FF453A"
+
+[colors.footer_bar]
+foreground = "#0E0E12"
+background = "#EDEDF0"
+
+[colors.selection]
+text = "#0E0E12"
+background = "#0A84FF"
+
+[colors.normal]
+black = "#3A3A3E"
+red = "#FF453A"
+green = "#32D74B"
+yellow = "#FFD60A"
+blue = "#0A84FF"
+magenta = "#BF5AF2"
+cyan = "#64D2FF"
+white = "#E5E5EA"
+
+[colors.bright]
+black = "#5A5A60"
+red = "#FF6961"
+green = "#5DE87B"
+yellow = "#FFE566"
+blue = "#5AB0FF"
+magenta = "#D08BF5"
+cyan = "#8FE0FF"
+white = "#F5F5F7"

@@ -1,0 +1,5 @@
+# Colores del tema actual (antes esto era un symlink directo a este mismo archivo)
+include=~/.config/omarchy/current/theme/mako.ini
+
+# Esquinas redondeadas consistentes con decoration:rounding de hyprland (14px)
+border-radius=14

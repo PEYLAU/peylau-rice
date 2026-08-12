@@ -1,0 +1,33 @@
+# Paleta iOS Glass
+#
+# Colores de sistema de iOS/visionOS en su variante oscura (systemBlue,
+# systemRed, systemGreen... tal cual los define Apple para dark mode), sobre
+# un fondo grafito muy oscuro con un punto de azul.
+#
+# Esto es SOLO la paleta. La parte translucida del tema (waybar, walker, mako,
+# terminales) no vive aqui: omarchy usa este fichero para rellenar plantillas
+# que esperan hex opaco, asi que las transparencias van en los ficheros que el
+# tema trae ya hechos y que ganan a la plantilla.
+accent = "#0A84FF"
+cursor = "#F5F5F7"
+foreground = "#EDEDF0"
+background = "#0E0E12"
+selection_foreground = "#0E0E12"
+selection_background = "#0A84FF"
+
+color0 = "#3A3A3E"
+color1 = "#FF453A"
+color2 = "#32D74B"
+color3 = "#FFD60A"
+color4 = "#0A84FF"
+color5 = "#BF5AF2"
+color6 = "#64D2FF"
+color7 = "#E5E5EA"
+color8 = "#5A5A60"
+color9 = "#FF6961"
+color10 = "#5DE87B"
+color11 = "#FFE566"
+color12 = "#5AB0FF"
+color13 = "#D08BF5"
+color14 = "#8FE0FF"
+color15 = "#F5F5F7"

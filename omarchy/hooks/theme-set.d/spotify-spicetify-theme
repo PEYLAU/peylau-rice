@@ -1,0 +1,157 @@
+#!/bin/bash
+# Sync Spotify (via spicetify) with the current Omarchy theme.
+
+set -e
+
+command -v spicetify >/dev/null || exit 0
+
+COLORS_FILE="$HOME/.config/omarchy/current/theme/colors.toml"
+[[ -f $COLORS_FILE ]] || exit 0
+
+# spicetify's color.ini wants bare hex, without the leading '#'
+get_color() {
+  sed -n "s/^$1 = //p" "$COLORS_FILE" | tr -d '"#'
+}
+
+BACKGROUND=$(get_color background)
+FOREGROUND=$(get_color foreground)
+ACCENT=$(get_color accent)
+COLOR1=$(get_color color1)
+
+BACKGROUND=${BACKGROUND:-111c18}
+FOREGROUND=${FOREGROUND:-C1C497}
+ACCENT=${ACCENT:-509475}
+COLOR1=${COLOR1:-FF5345}
+
+THEME_DIR="$HOME/.config/spicetify/Themes/Omarchy"
+mkdir -p "$THEME_DIR"
+
+# Los tonos intermedios NO salen de los slots ANSI (color0/color8): en cada tema
+# apuntan a sitios distintos y en temas claros acaban siendo grises invisibles.
+# Se derivan mezclando fondo -> texto en un porcentaje, asi la direccion se
+# ajusta sola en temas claros y oscuros. Los porcentajes salen del tema de
+# fabrica de Spotify (fondo #121212, subtexto #b3b3b3 = 70% del camino).
+BACKGROUND="$BACKGROUND" FOREGROUND="$FOREGROUND" ACCENT="$ACCENT" \
+  COLOR1="$COLOR1" THEME_DIR="$THEME_DIR" \
+  THEME_NAME="$(cat "$HOME/.config/omarchy/current/theme.name" 2>/dev/null || echo custom)" \
+  python3 <<'PY'
+import os
+
+def hex_to_rgb(h):
+    h = h.strip().lstrip("#")[:6]
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+bg = hex_to_rgb(os.environ["BACKGROUND"])
+fg = hex_to_rgb(os.environ["FOREGROUND"])
+
+def mix(pct):
+    """pct% del camino desde el fondo hacia el color del texto."""
+    return "".join(f"{round(b + (f - b) * pct / 100):02x}" for b, f in zip(bg, fg))
+
+colors = {
+    "text":               os.environ["FOREGROUND"],
+    "subtext":            mix(80),
+    "main":               os.environ["BACKGROUND"],
+    "main-elevated":      mix(8),
+    "highlight":          mix(11),
+    "highlight-elevated": mix(16),
+    "sidebar":            os.environ["BACKGROUND"],
+    "player":             os.environ["BACKGROUND"],
+    "card":               mix(5),
+    "shadow":             os.environ["BACKGROUND"],
+    "selected-row":       os.environ["ACCENT"],
+    "button":             os.environ["ACCENT"],
+    "button-active":      os.environ["ACCENT"],
+    "button-disabled":    mix(40),
+    "tab-active":         mix(12),
+    "notification":       mix(8),
+    "notification-error": os.environ["COLOR1"],
+    "misc":               mix(60),
+}
+
+lines = [f"; Generated from Omarchy theme: {os.environ['THEME_NAME']}", "[omarchy]"]
+lines += [f"{k:<19} = {v}" for k, v in colors.items()]
+
+with open(os.path.join(os.environ["THEME_DIR"], "color.ini"), "w") as f:
+    f.write("\n".join(lines) + "\n")
+PY
+
+# Match the 8px rounding used across the desktop. Harmless if Spotify
+# renames these classes -- the rules simply stop matching.
+cat >"$THEME_DIR/user.css" <<'EOF'
+.Root__main-view,
+.Root__nav-bar,
+.Root__right-sidebar,
+.Root__now-playing-bar,
+.main-buddyFeed-container {
+  border-radius: 8px;
+}
+EOF
+
+# En temas claros hace falta un parche extra. Spotify fija blanco translucido
+# (#ffffffb3, #fff9) en el panel derecho y en los botones de icono, dando por
+# hecho que el fondo es oscuro; sobre un tema claro queda invisible. Las clases
+# que aplican ese blanco son ofuscadas (.Y3G3DUJMMEgHFlUb) y cambian en cada
+# actualizacion de Spotify, asi que nos anclamos a los contenedores, que si
+# tienen nombres estables, y forzamos el color heredado del tema.
+if [[ -f $HOME/.config/omarchy/current/theme/light.mode ]]; then
+  cat >>"$THEME_DIR/user.css" <<'EOF'
+
+/* --- Correcciones de contraste para temas claros ------------------------- */
+
+.main-nowPlayingView-container,
+.main-nowPlayingView-container *,
+.main-genericButton-button {
+  color: var(--spice-subtext) !important;
+}
+
+/* Los titulos vuelven al color de texto pleno, para conservar la jerarquia. */
+.main-nowPlayingView-container a,
+.main-nowPlayingView-container h1,
+.main-nowPlayingView-container h2,
+.main-nowPlayingView-container h3,
+.main-nowPlayingView-container [class*="encore-text-headline"],
+.main-nowPlayingView-container [class*="-bold"] {
+  color: var(--spice-text) !important;
+}
+EOF
+fi
+
+# spicetify refuses to run without Spotify's prefs file. It only exists after
+# Spotify's first launch, so create an empty one if needed -- Spotify fills it in.
+PREFS="$HOME/.config/spotify/prefs"
+if [[ ! -f $PREFS ]]; then
+  mkdir -p "$(dirname "$PREFS")"
+  touch "$PREFS"
+fi
+if ! grep -q '^prefs_path *= *[^ ]' "$HOME/.config/spicetify/config-xpui.ini" 2>/dev/null; then
+  spicetify config prefs_path "$PREFS" >/dev/null 2>&1 || true
+fi
+
+# spicetify reinicia Spotify ejecutando /opt/spotify/spotify directamente, lo
+# que salta el wrapper /usr/bin/spotify y por tanto ~/.config/spotify-flags.conf.
+# Sin estas flags Spotify cae a XWayland y se renderiza a la escala equivocada.
+# Hay que escribirlo con sed: `spicetify config` ignora valores que empiezan por '--'.
+SPICE_INI="$HOME/.config/spicetify/config-xpui.ini"
+LAUNCH_FLAGS='--ozone-platform=wayland|--enable-features=UseOzonePlatform,WaylandWindowDecorations'
+if [[ -f $SPICE_INI ]] && ! grep -q '^spotify_launch_flags *= *--ozone-platform' "$SPICE_INI"; then
+  # Delimitador '#': el valor contiene '|', que no sirve como separador aqui.
+  sed -i "s#^spotify_launch_flags .*#spotify_launch_flags   = $LAUNCH_FLAGS#" "$SPICE_INI"
+fi
+
+spicetify config current_theme Omarchy color_scheme omarchy >/dev/null 2>&1 || true
+
+# `spicetify apply` reinicia Spotify -- y "reiniciar" para spicetify significa
+# lanzarlo, este abierto o cerrado. Por eso se abria solo en cada cambio de tema.
+# Con -n solo parchea los ficheros: el tema nuevo se ve la proxima vez que lo abras.
+SPICE_ARGS=()
+pgrep -x spotify >/dev/null || SPICE_ARGS=(-n)
+
+# `apply` fails when Spotify has never been patched; back up and patch first.
+if spicetify "${SPICE_ARGS[@]}" apply >/dev/null 2>&1; then
+  echo "Spotify (spicetify) theme updated"
+elif spicetify "${SPICE_ARGS[@]}" backup apply >/dev/null 2>&1; then
+  echo "Spotify (spicetify) patched and themed"
+else
+  echo "Spotify (spicetify) theme FAILED -- run 'spicetify backup apply' manually" >&2
+fi
