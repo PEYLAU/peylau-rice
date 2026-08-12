@@ -161,7 +161,7 @@ los decorativos.
 
 Tres degradados generados, no fotografías:
 
-| | |
+| Fondo | Carácter |
 |---|---|
 | `1-aurora` | Azules profundos con una diagonal índigo |
 | `2-twilight` | Violeta a magenta. El que más luce el `vibrancy` |
