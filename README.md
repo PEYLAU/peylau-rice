@@ -27,7 +27,7 @@ La configuración de mi escritorio, versionada. Dos cosas la separan de un volca
 
 ## El tema: iOS Glass
 
-<img src="docs/assets/wallpapers.png" width="100%" alt="Los tres fondos del tema">
+<img src="docs/assets/wallpapers.jpg" width="100%" alt="Los tres fondos del tema">
 
 Cristal esmerilado al estilo de iOS y visionOS. Los cuatro detalles que lo sostienen:
 
