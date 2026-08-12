@@ -1,66 +1,32 @@
-# Lista BLANCA, no negra.
+# Con los enlaces puestos, ~/.config/btop y compañía apuntan DENTRO de este
+# repo. Es decir, lo que esas aplicaciones escriban en tiempo de ejecución
+# aparece aquí como cambios sin seguimiento. Lo de abajo es esa basura.
 #
-# ~/.config tiene dentro sesiones de navegador, cookies y tokens (chromium,
-# zen, mozilla, vesktop, opencode...). Con una lista negra basta olvidar una
-# entrada para publicar credenciales, y en git eso ya no se borra del historial
-# aunque quites el fichero despues. Asi que se ignora TODO y se readmite a mano
-# solo lo que es configuracion de escritorio.
-#
-# Al añadir algo nuevo: primero `!/loquesea/`, luego `git status` y comprobar
-# que no arrastra nada que no toque.
+# Ojo: esto es una lista NEGRA y funciona porque el repo solo contiene lo que
+# se metió a mano. La lista blanca que filtraba ~/.config (con sus sesiones de
+# navegador y tokens) hizo su trabajo en el commit inicial; aquí ya no aplica.
 
-/*
-!.gitignore
-!README.md
-
-# --- Escritorio ---
-!/hypr/
-!/waybar/
-!/walker/
-!/mako/
-!/swayosd/
-
-# --- Terminales ---
-!/alacritty/
-!/foot/
-!/kitty/
-!/ghostty/
-!/xdg-terminals.list
-
-# --- Shell ---
-# Solo config.fish. fish_variables son variables universales que fish reescribe
-# solo (rutas absolutas, estado de plugins): versionarlo genera conflictos en
-# cada maquina y no aporta nada.
-!/fish/
-/fish/*
-!/fish/config.fish
-
-# --- Utilidades ---
-!/btop/
-!/cava/
-!/fastfetch/
-!/uwsm/
-!/starship.toml
-
-# --- Omarchy ---
-# Se readmite el directorio pero no todo su contenido: 'current' son ficheros
-# GENERADOS por `omarchy theme set` a partir de themes/ + plantillas, pesa 7 MB
-# y cambia en cada cambio de tema. Versionarlo seria ruido puro.
-!/omarchy/
-/omarchy/*
-!/omarchy/themes/
-!/omarchy/hooks/
-!/omarchy/themed/
-!/omarchy/branding/
-
-# --- Basura que no se versiona ---
-# omarchy-refresh-config deja copias con timestamp al reemplazar un config
-# (style.css.bak.1786384053). Son utiles en local, no en el repo.
+# Copias con marca de tiempo que deja omarchy-refresh-config al reemplazar un
+# fichero por el de serie.
 *.bak
 *.bak.*
 
-# Caches y estado que algunas apps escriben dentro de su carpeta de config.
+# Registros y estado de aplicaciones.
 *.log
 *.tmp
-/btop/btop.log
-/nvim/lazy-lock.json.bak
+config/btop/btop.log
+
+# Variables universales de fish: las reescribe fish sola, con rutas absolutas
+# que no valen en otra máquina.
+config/fish/fish_variables
+
+# Cachés que walker y elephant crean junto a su configuración.
+config/walker/cache/
+config/walker/history*
+
+# Ficheros generados por `omarchy theme set` a partir de config/omarchy/themes
+# y las plantillas. Ocupan 7 MB y cambian con cada tema.
+config/omarchy/current/
+
+# Basura del escritorio.
+.DS_Store
